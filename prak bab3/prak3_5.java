@@ -4,7 +4,7 @@ public class prak3_5 {
         int n=0, total = 0, bil=9;
         while (bil!=0){
             n++;
-            System.out.println("MAsukan bilangan ke "+-n+" =");
+            System.out.println("Masukan bilangan ke "+-n+" =");
             bil = masukan.nextInt();
             total += bil;
         }
