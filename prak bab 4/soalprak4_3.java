@@ -4,4 +4,22 @@ public class soalprak4_3 {
 // Contoh : 1 = 1
 // 6 = 1 + 2 + 3
 // 28 = 1 + 2 + 4 + 7 + 14
+    public static void main(String[] args) {
+        System.out.println("Bilangan amisabel dari 1 sampai 1000:");
+        for (int i = 1; i <= 1000; i++) {
+            if (isAmisabel(i)) {
+                System.out.print(i + " ");
+            }
+        }
+    }
+
+    private static boolean isAmisabel(int number) {
+        int sumOfFactors = 0;
+        for (int i = 1; i <= number / 2; i++) {
+            if (number % i == 0) {
+                sumOfFactors += i;
+            }
+        }
+        return sumOfFactors == number;
+    }
 }
