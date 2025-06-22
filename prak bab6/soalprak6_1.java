@@ -3,7 +3,7 @@ import java.io.FileReader;
 
 public class soalprak6_1 {
     public static void main(String[] args) throws Exception {
-        String fileName = "mhs.txt";
+        String fileName = "prak bab6//mhs.txt";
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         
         String line;
