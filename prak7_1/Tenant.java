@@ -1,5 +1,5 @@
 public class Tenant {
-    private String id; // no KTP/SIM
+    private String id; 
     private String name;
     private String address;
     private String phone;

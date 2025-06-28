@@ -17,7 +17,6 @@ public class HotelManagement {
     public void loadRoomsFromConfig(String configFilePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(configFilePath))) {
             int totalRooms = Integer.parseInt(br.readLine().trim());
-            // For simplicity, distribute rooms equally among types
             int singleRooms = totalRooms / 3;
             int doubleRooms = totalRooms / 3;
             int suiteRooms = totalRooms - singleRooms - doubleRooms;
