@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class HotelManagement {
     private List<Room> rooms;
@@ -91,15 +93,88 @@ public class HotelManagement {
     }
 
     public void showRoomStatus() {
+        int occupiedCount = 0;
+        int emptyCount = 0;
+        int bookedCount = 0;
         for (Room room : rooms) {
             System.out.println(room);
+            switch (room.getStatus()) {
+                case OCCUPIED:
+                    occupiedCount++;
+                    break;
+                case EMPTY:
+                    emptyCount++;
+                    break;
+                case BOOKED:
+                    bookedCount++;
+                    break;
+            }
         }
+        System.out.println("Summary:");
+        System.out.println("Occupied rooms: " + occupiedCount);
+        System.out.println("Empty rooms: " + emptyCount);
+        System.out.println("Booked rooms: " + bookedCount);
+    }
+
+    public void showTenantData() {
+        Map<Tenant, List<Room>> tenantRooms = new HashMap<>();
+        Map<Tenant, Integer> tenantStayCount = new HashMap<>();
+
+        for (Transaction transaction : transactions) {
+            Tenant tenant = transaction.getTenant();
+            Room room = transaction.getRoom();
+
+            tenantRooms.computeIfAbsent(tenant, k -> new ArrayList<>()).add(room);
+            tenantStayCount.put(tenant, tenantStayCount.getOrDefault(tenant, 0) + 1);
+        }
+
+        System.out.println("Tenant Data:");
+        for (Tenant tenant : tenantRooms.keySet()) {
+            System.out.println(tenant);
+            System.out.print("Rooms rented: ");
+            List<Room> roomsRented = tenantRooms.get(tenant);
+            for (Room room : roomsRented) {
+                System.out.print(room.getRoomNumber() + " ");
+            }
+            System.out.println();
+        }
+
+        System.out.println("Frequent Tenants:");
+        tenantStayCount.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .sorted((e1, e2) -> e2.getValue() - e1.getValue())
+                .forEach(entry -> System.out.println(entry.getKey().getName() + " - " + entry.getValue() + " stays"));
     }
 
     public void showTransactions() {
         for (Transaction transaction : transactions) {
             System.out.println(transaction);
         }
+    }
+
+    public void showTransactionsByPeriod(Scanner scanner) {
+        System.out.print("Enter year (YYYY): ");
+        int year = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+        System.out.print("Enter month (1-12, or 0 for whole year): ");
+        int month = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        int totalTransactions = 0;
+        int totalRevenue = 0;
+
+        for (Transaction transaction : transactions) {
+            LocalDate date = transaction.getDate();
+            if (date.getYear() == year && (month == 0 || date.getMonthValue() == month)) {
+                System.out.println(transaction);
+                totalTransactions++;
+                totalRevenue += transaction.getRoom().getPrice();
+            }
+        }
+
+        System.out.println("Total transactions: " + totalTransactions);
+        System.out.println("Total revenue: Rp. " + totalRevenue);
     }
 
     public static void main(String[] args) {
@@ -109,48 +184,50 @@ public class HotelManagement {
         hm.loadRoomsFromConfig("prak7_1/config.txt");
 
         while (true) {
-            System.out.println("\nHotel Management System");
-            System.out.println("1. Book Room");
+            System.out.println("\nSistem Manajemen Hotel");
+            System.out.println("1. Pesan Kamar");
             System.out.println("2. Check In");
             System.out.println("3. Check Out");
-            System.out.println("4. Show Room Status");
-            System.out.println("5. Show Transactions");
-            System.out.println("6. Exit");
-            System.out.print("Choose an option: ");
+            System.out.println("4. Tampilkan Status Kamar");
+            System.out.println("5. Tampilkan Transaksi");
+            System.out.println("6. Tampilkan Data Penyewa");
+            System.out.println("7. Tampilkan Transaksi Berdasarkan Periode");
+            System.out.println("8. Keluar");
+            System.out.print("Pilih opsi: ");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // consume newline
 
             switch (choice) {
                 case 1:
-                    System.out.print("Enter tenant ID (KTP/SIM): ");
+                    System.out.print("Masukkan ID penyewa (KTP/SIM): ");
                     String id = scanner.nextLine();
-                    System.out.print("Enter tenant name: ");
+                    System.out.print("Masukkan nama penyewa: ");
                     String name = scanner.nextLine();
-                    System.out.print("Enter tenant address: ");
+                    System.out.print("Masukkan alamat penyewa: ");
                     String address = scanner.nextLine();
-                    System.out.print("Enter tenant phone: ");
+                    System.out.print("Masukkan nomor telepon penyewa: ");
                     String phone = scanner.nextLine();
                     Tenant tenant = new Tenant(id, name, address, phone);
 
-                    System.out.print("Enter room type to book (SINGLE, DOUBLE, SUITE): ");
+                    System.out.print("Masukkan tipe kamar yang ingin dipesan (SINGLE, DOUBLE, SUITE): ");
                     String typeStr = scanner.nextLine().toUpperCase();
                     Room.RoomType type;
                     try {
                         type = Room.RoomType.valueOf(typeStr);
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid room type.");
+                        System.out.println("Tipe kamar tidak valid.");
                         break;
                     }
                     hm.bookRoom(tenant, type);
                     break;
                 case 2:
-                    System.out.print("Enter room number to check in: ");
+                    System.out.print("Masukkan nomor kamar untuk check in: ");
                     int checkInRoom = scanner.nextInt();
                     hm.checkIn(checkInRoom);
                     break;
                 case 3:
-                    System.out.print("Enter room number to check out: ");
+                    System.out.print("Masukkan nomor kamar untuk check out: ");
                     int checkOutRoom = scanner.nextInt();
                     hm.checkOut(checkOutRoom);
                     break;
@@ -161,11 +238,17 @@ public class HotelManagement {
                     hm.showTransactions();
                     break;
                 case 6:
-                    System.out.println("Exiting...");
+                    hm.showTenantData();
+                    break;
+                case 7:
+                    hm.showTransactionsByPeriod(scanner);
+                    break;
+                case 8:
+                    System.out.println("Keluar...");
                     scanner.close();
                     System.exit(0);
                 default:
-                    System.out.println("Invalid option.");
+                    System.out.println("Opsi tidak valid.");
             }
         }
     }
