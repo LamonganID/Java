@@ -1,8 +1,8 @@
 import java.io.*;
 public class prak6_2 {
     public static void main(String[] args ) throws Exception {
-        File fileIn = new File("prak6_2.java");
-        File fileOut = new File("prak6_2_out.java");
+        File fileIn = new File("/../prak bab6/mhs.txt");
+        File fileOut = new File("/../prak bab6/mhs2.txt");
         if (!fileIn.exists() || !fileIn.canRead()) {
             System.out.println("File tidak ditemukan atau tidak dapat dibaca: " + fileIn);
             return;

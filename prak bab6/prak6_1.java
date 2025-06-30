@@ -2,7 +2,8 @@ import java.io.*;
 public class prak6_1 {
     public static void main(String[] args)
     {
-        File file = new File("prak6_2.java");
+        File file = new File("prak bab6/mhs.txt");
+        System.out.println("Absolute path: " + file.getAbsolutePath());
         if (!file.exists() || !file.canRead()) {
             System.out.print("File tidak ditemukan atau tidak dapat dibaca." + "\n" + file);
             return;
