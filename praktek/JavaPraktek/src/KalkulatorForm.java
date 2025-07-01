@@ -194,7 +194,7 @@ public class KalkulatorForm extends javax.swing.JFrame {
         String hasil;
         nilai1 = Double.parseDouble(jTextField1.getText());
         nilai2 = Double.parseDouble(jTextField2.getText());
-        nilai3 = nilai1 % nilai2;
+        nilai3 = nilai1 / nilai2;
         hasil = String.valueOf(nilai3);
         jLabel1.setText(hasil);
         
